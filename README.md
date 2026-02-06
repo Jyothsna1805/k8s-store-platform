@@ -1,70 +1,55 @@
-# Store Application Deployment using Helm
+# Store Application Platform (Kubernetes + Helm)
 
-This project demonstrates deploying a simple Store application on Kubernetes using Helm with namespace isolation and resource management.
+## Overview
+This project demonstrates a simplified multi-tenant store platform built on Kubernetes.
+Each store is provisioned in an isolated namespace using Helm, with resource limits and clean lifecycle management.
+
+The goal is to show:
+- Store provisioning & deletion
+- Namespace-level isolation
+- Idempotent operations
+- Helm-based deployments
+- Clear local → production story
 
 ---
 
-## Prerequisites
+## System Architecture
+
+### Components
+- **Backend API (Node.js)**  
+  Handles store lifecycle: create, list, delete.
+- **Helm Chart**  
+  Defines Kubernetes resources per store.
+- **Kubernetes (Minikube / k3s)**  
+  Runs isolated namespaces per store.
+
+### Responsibilities
+- Backend validates requests and ensures idempotency.
+- Helm provisions Kubernetes resources.
+- Kubernetes enforces isolation and quotas.
+
+---
+
+## End-to-End Flow
+
+1. Create store via API
+2. Namespace is created
+3. Deployment + Service applied
+4. Store becomes ready
+5. Store can be deleted
+6. Namespace and all resources are cleaned up
+
+---
+
+## Local Setup (Minikube)
+
+### Prerequisites
 - Docker
 - Minikube
 - kubectl
 - Helm
+- Node.js (>=18)
 
----
-
-## Project Structure
-
-```
-helm/store/
-├── Chart.yaml
-├── values.yaml
-├── values-local.yaml
-├── values-prod.yaml
-├── templates/
-│   ├── deployment.yaml
-│   ├── service.yaml
-│   ├── namespace.yaml
-│   ├── resourcequota.yaml
-│   └── limitrange.yaml
-```
-
----
-
-## Local Setup
-
+### Start Kubernetes
 ```bash
 minikube start
-```
-
----
-
-## Deploy Store Application
-
-```bash
-kubectl create namespace store-demo
-helm install store-demo ./helm/store -n store-demo -f values-local.yaml
-```
-
----
-
-## Verify Deployment
-
-```bash
-kubectl get pods -n store-demo
-kubectl get svc -n store-demo
-```
-
----
-
-## Cleanup Resources
-
-```bash
-helm uninstall store-demo -n store-demo
-kubectl delete namespace store-demo
-```
-
----
-
-## Result
-
-The Store application is successfully deployed on Kubernetes using Helm with proper deployment, service exposure, and resource isolation.
