@@ -110,84 +110,27 @@ The following screenshots demonstrate a complete end-to-end WooCommerce flow.
 ✔ Cash on Delivery enabled
 ✔ Order successfully created and persisted
 
-Persistence:
+---
 
-Each store uses PersistentVolumeClaims
-WordPress database state survives pod restarts
-Store data is isolated per namespace
+## Persistence & Data Management
 
-Multi-Tenant Isolation:
+Each provisioned store is stateful and backed by persistent storage to ensure data durability across pod restarts and upgrades.
 
-Namespace per store
-Dedicated PVCs, Secrets, Services
-No cross-store access
-Independent lifecycle per store
+- **Database Persistence**
+  - WooCommerce stores use a MySQL database deployed per store.
+  - Each database uses a dedicated **PersistentVolumeClaim (PVC)**.
+  - PVCs are created inside the store’s namespace to ensure isolation.
 
-Optional protections implemented:
+- **WordPress Data Persistence**
+  - WordPress uploads and plugins are stored on a separate PVC.
+  - Ensures media and configuration are not lost during pod recreation.
 
-ResourceQuota per namespace
-LimitRange enforcing default CPU/memory limits
+- **Storage Classes**
+  - Local development: default Kubernetes storage class (e.g., `standard`).
+  - Production (k3s/VPS): configurable via Helm values to use hostPath, local-path, or cloud-backed storage.
 
-Security Posture:
-
-Secrets stored using Kubernetes Secrets
-No hardcoded credentials
-Public access only via Ingress
-Backend APIs internal-only
-Least-privilege RBAC for provisioning component
-Containers run without elevated privileges where possible
-
-Idempotency & Failure Handling:
-
-Store creation is safe to retry
-Helm release names are deterministic
-Partial failures clean up resources
-Status reflects Failed with clear reason
-Delete operation guarantees cleanup
-
-Scaling Plan:--
-Horizontally Scalable:
-
-Dashboard
-Backend / Orchestrator
-
-Stateful Constraints:
-
-Databases remain stateful per store
-PVC-backed storage
-
-Provisioning Throughput:
-
-Concurrent Helm installs supported
-Can introduce work queues / rate limits
-
-Abuse Prevention & Guardrails:
-
-Max stores per user (configurable)
-Namespace-level resource caps
-Provisioning timeouts
-Controlled blast radius per store
-
-Production / VPS Deployment (k3s):
-
-The same Helm charts deploy to production with configuration changes only.
-Changes via values-prod.yaml
-Domain names
-StorageClass
-Ingress class
-Secrets source
-
-Optional TLS (cert-manager):
-helm upgrade --install store-platform charts/store -f charts/store/values-prod.yaml
-
-Upgrade & Rollback Strategy:
-Helm-managed releases
-Safe upgrades using helm upgrade
-Rollback using
-helm rollback <release> <revision>
-
-Repository Structure:
-
+---
+REPOSITORY STRUCTURE :
 .
 ├── backend/                # API + provisioning logic
 ├── charts/
@@ -197,32 +140,111 @@ Repository Structure:
 ├── README.md
 └── system-design.md
 
-System Design & Tradeoffs:
-Why Helm?
+## Isolation, Reliability, and Cleanup
 
-Declarative
-Idempotent
-Environment configurable
-Built-in rollback
+### Namespace-based Isolation
+- Each store is provisioned in its **own Kubernetes namespace**.
+- All resources (Pods, Services, PVCs, Secrets, Ingress) are scoped to that namespace.
+- This ensures strong tenant isolation and controlled blast radius.
 
-Why Namespace-per-Store?
+### Reliability
+- Pods include **readiness and liveness probes**.
+- Provisioning status is tracked (`Provisioning → Ready → Failed`).
+- Helm ensures consistent, declarative deployments.
 
-Strong isolation
-Clean teardown
-Resource governance
+### Cleanup Guarantees
+- Deleting a store:
+  - Uninstalls the Helm release.
+  - Deletes the namespace.
+  - Automatically removes PVCs, Secrets, and Services.
+- No orphaned resources remain after teardown.
 
-Why StatefulSet / PVCs?
+---
 
-Required for WordPress & DB persistence
+## Security Posture
 
-Demo Video Coverage
+- **Secrets Management**
+  - Database credentials and WordPress secrets are stored as Kubernetes Secrets.
+  - No secrets are hardcoded in source code or Helm charts.
 
-The demo video shows:
+- **RBAC & Least Privilege**
+  - Provisioning backend uses limited Kubernetes permissions.
+  - Scoped access only to namespaces it manages.
 
-System architecture overview
-Helm-based provisioning
-Namespace isolation
-Store creation
-Product → Cart → Checkout → Order
-Kubernetes resources
-Store deletion and cleanup
+- **Network Exposure**
+  - Only Ingress endpoints are publicly exposed.
+  - Databases and internal services remain cluster-internal.
+
+- **Container Hardening**
+  - Official images are used (WordPress, MySQL).
+  - Containers can be configured to run as non-root in production.
+
+---
+
+## Scaling Plan
+
+### Horizontally Scalable Components
+- **Dashboard (Frontend)**: stateless, horizontally scalable.
+- **Backend API / Orchestrator**: stateless, can scale with replicas.
+- **Ingress Controller**: scalable based on traffic.
+
+### Provisioning Throughput
+- Store provisioning requests are serialized or rate-limited.
+- Concurrency controls prevent resource exhaustion.
+- Horizontal scaling allows multiple store creations in parallel.
+
+### Stateful Constraints
+- Databases remain single-replica per store.
+- Scaling is achieved by provisioning more stores, not scaling individual databases.
+
+---
+
+## Abuse Prevention & Guardrails
+
+- **Rate Limiting**
+  - Limit store creation requests per user/IP.
+
+- **Quotas**
+  - Namespace-level `ResourceQuota` and `LimitRange`:
+    - CPU
+    - Memory
+    - Maximum PVC size per store
+
+- **Timeouts**
+  - Provisioning jobs have timeouts to prevent stuck states.
+
+- **Audit Logging**
+  - All create/delete actions are logged with timestamps.
+
+---
+
+## Local-to-Production Deployment Story
+
+### Local (Development)
+- Kubernetes: Kind / Minikube
+- Ingress: NGINX with local domain mapping (e.g., `/etc/hosts`)
+- Storage: default local storage class
+
+### Production-like (VPS with k3s)
+- Kubernetes: k3s
+- Ingress: NGINX or Traefik
+- Domains: real DNS records
+- Storage: hostPath or cloud-backed volumes
+- Secrets injected via Helm values or external secret managers
+
+### Helm Values Separation
+- values-local.yaml
+- values-prod.yaml
+
+This allows the **same Helm charts** to be deployed without code changes.
+
+---
+
+## Upgrade & Rollback Strategy
+
+- Store upgrades are performed using:
+
+  helm upgrade <release-name> ./charts/store -f values-prod.yaml
+
+**THIS PROJECT DEMONSTRATES A PRODUCTION-READY, KUBERNETES-NATIVE MULTI-TENANT STORE PROVISIONING PLATFORM WITH END-TO-END ORDER FLOW, STRONG ISOLATION, AND A CLEAR PATH FROM LOCAL DEVELOPMENT TO VPS-BASED PRODUCTION DEPLOYMENT.**
+
