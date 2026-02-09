@@ -91,23 +91,17 @@ The following screenshots demonstrate a complete end-to-end WooCommerce flow.
 
 1. WooCommerce Store Setup Completed
 <img width="1600" height="747" alt="image" src="https://github.com/user-attachments/assets/3b66a15e-bcd9-46a0-972b-05f6acbb2f9e" />
-<img width="1600" height="747" alt="image" src="https://github.com/user-attachments/assets/3b66a15e-bcd9-46a0-972b-05f6acbb2f9e" />
-
 
 2. Product Page
-<img width="1600" height="750" alt="image" src="https://github.com/user-attachments/assets/15fafb03-4bbf-47bc-8511-8797b7c897f0" />
 <img width="1600" height="750" alt="image" src="https://github.com/user-attachments/assets/15fafb03-4bbf-47bc-8511-8797b7c897f0" />
 
 3. Cart Page
 <img width="929" height="831" alt="image" src="https://github.com/user-attachments/assets/47b98736-fb2f-43f3-86e5-340800b93cd2" />
-<img width="929" height="831" alt="image" src="https://github.com/user-attachments/assets/47b98736-fb2f-43f3-86e5-340800b93cd2" />
 
 4. Checkout Page (GST + COD Enabled)
 <img width="1127" height="859" alt="image" src="https://github.com/user-attachments/assets/d1962696-b806-4bae-9175-5860aab7087a" />
-<img width="1127" height="859" alt="image" src="https://github.com/user-attachments/assets/d1962696-b806-4bae-9175-5860aab7087a" />
 
 5. Order Confirmation Page
-<img width="1177" height="779" alt="image" src="https://github.com/user-attachments/assets/160e2e22-c487-4cf1-a5ed-b34a5766db2f" />
 <img width="1177" height="779" alt="image" src="https://github.com/user-attachments/assets/160e2e22-c487-4cf1-a5ed-b34a5766db2f" />
 
 
