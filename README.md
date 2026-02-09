@@ -1,55 +1,20 @@
-# Store Application Platform (Kubernetes + Helm)
+# Kubernetes Store Provisioning Platform
 
-## Overview
-This project demonstrates a simplified multi-tenant store platform built on Kubernetes.
-Each store is provisioned in an isolated namespace using Helm, with resource limits and clean lifecycle management.
+This project provisions isolated WooCommerce stores on Kubernetes using Helm.
 
-The goal is to show:
-- Store provisioning & deletion
-- Namespace-level isolation
-- Idempotent operations
-- Helm-based deployments
-- Clear local → production story
+## Features
+- Namespace-per-store isolation
+- Helm-based WordPress + MySQL deployment
+- Persistent storage via PVCs
+- Ingress-based access
+- End-to-end order flow with WooCommerce
 
----
-
-## System Architecture
-
-### Components
-- **Backend API (Node.js)**  
-  Handles store lifecycle: create, list, delete.
-- **Helm Chart**  
-  Defines Kubernetes resources per store.
-- **Kubernetes (Minikube / k3s)**  
-  Runs isolated namespaces per store.
-
-### Responsibilities
-- Backend validates requests and ensures idempotency.
-- Helm provisions Kubernetes resources.
-- Kubernetes enforces isolation and quotas.
-
----
-
-## End-to-End Flow
-
-1. Create store via API
-2. Namespace is created
-3. Deployment + Service applied
-4. Store becomes ready
-5. Store can be deleted
-6. Namespace and all resources are cleaned up
-
----
-
-## Local Setup (Minikube)
-
-### Prerequisites
-- Docker
-- Minikube
-- kubectl
+## Tech Stack
+- Node.js (Provisioning API)
+- React (Dashboard)
+- Kubernetes
 - Helm
-- Node.js (>=18)
+- WordPress + WooCommerce
 
-### Start Kubernetes
-```bash
-minikube start
+## Status
+Demo-ready. Full README to be expanded.

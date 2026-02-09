@@ -1,0 +1,9 @@
+store:
+  name: ""
+
+wordpress:
+  image: wordpress:6.4-apache
+
+mysql:
+  image: mysql:8.0
+  storage: 1Gi
