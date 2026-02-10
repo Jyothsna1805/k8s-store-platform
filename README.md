@@ -60,7 +60,23 @@ Each store provisions:
 6. User deletes store → all resources are cleaned up
 
 ---
+REPOSITORY STRUCTURE  :
 
+k8s-store-platform/
+├── backend/                # Node.js backend / orchestrator
+│   ├── src/
+│   ├── routes/
+│   └── index.js
+├── charts/
+│   └── store/              # Helm chart for WooCommerce store
+│       ├── templates/
+│       ├── values.yaml
+│       └── Chart.yaml
+├── values-local.yaml       # Local environment values
+├── values-prod.yaml        # Production (VPS/k3s) values
+├── screenshots/            # WooCommerce demo screenshots
+├── README.md
+└── system-design.md
 ## Local Setup Instructions
 
 ### Prerequisites
@@ -130,15 +146,6 @@ Each provisioned store is stateful and backed by persistent storage to ensure da
   - Production (k3s/VPS): configurable via Helm values to use hostPath, local-path, or cloud-backed storage.
 
 ---
-REPOSITORY STRUCTURE :
-.
-├── backend/                # API + provisioning logic
-├── charts/
-│   └── store/              # Helm chart for stores
-├── scripts/                # Helper scripts
-├── screenshots/            # Demo screenshots
-├── README.md
-└── system-design.md
 
 ## Isolation, Reliability, and Cleanup
 
